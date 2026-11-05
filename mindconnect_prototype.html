@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindConnect — Interactive Prototype</title>
+<style>
+:root{--ink:#203344;--muted:#657887;--blue:#dceefa;--blue2:#7db8dc;--green:#dff1e8;--green2:#75b99b;--cream:#f8fbfa;--white:#fff;--line:#e4edf0;--shadow:0 14px 40px rgba(36,70,89,.12)}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#eaf5fb,#eef8f1);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:24px}
+.app{width:min(100%,410px);min-height:820px;background:var(--cream);border:8px solid #fff;border-radius:38px;box-shadow:var(--shadow);overflow:hidden;position:relative}
+.status{height:28px;padding:8px 20px 0;display:flex;justify-content:space-between;font-size:11px;color:#6d7e88}
+header{padding:17px 22px 12px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:18px;letter-spacing:-.4px}.logo{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,var(--blue2),var(--green2));display:grid;place-items:center;color:white;font-size:19px}
+.badge{font-size:11px;background:#edf5f5;color:#55716f;padding:7px 10px;border-radius:20px}
+main{padding:8px 20px 94px;min-height:680px}.screen{display:none;animation:fade .2s ease}.screen.active{display:block}@keyframes fade{from{opacity:.4;transform:translateY(5px)}to{opacity:1;transform:none}}
+h1{font-size:27px;line-height:1.15;letter-spacing:-.8px;margin:8px 0 9px}h2{font-size:19px;margin:0 0 8px}h3{font-size:14px;margin:0 0 6px}.sub{color:var(--muted);font-size:13px;line-height:1.5;margin:0 0 19px}
+.hero{background:linear-gradient(140deg,#e3f2fc,#e7f5ed);border-radius:25px;padding:22px;margin:12px 0 18px;position:relative;overflow:hidden}.hero:after{content:"☁";position:absolute;right:15px;top:12px;font-size:70px;opacity:.28}.hero p{font-size:13px;line-height:1.5;max-width:240px;margin:8px 0 0;color:#526a78}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px;box-shadow:0 5px 16px rgba(37,72,88,.04);cursor:pointer;transition:.15s}.card:active{transform:scale(.98)}.card .icon{font-size:23px;margin-bottom:9px}.card p{font-size:11px;color:var(--muted);line-height:1.4;margin:4px 0 0}.wide{grid-column:1/-1}
+button{border:0;border-radius:14px;padding:12px 15px;font-weight:700;font-size:13px;cursor:pointer;background:var(--ink);color:#fff}button.secondary{background:#eaf3f5;color:#355466}button.softgreen{background:#e3f3eb;color:#326b56}button.full{width:100%;margin-top:10px}.textbtn{background:transparent;color:#53778b;padding:8px}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin:19px 0 10px}.tiny{font-size:11px;color:var(--muted)}
+.mood-row{display:flex;justify-content:space-between;gap:6px;margin:14px 0}.mood{background:#fff;border:1px solid var(--line);border-radius:15px;flex:1;padding:12px 2px;text-align:center;cursor:pointer}.mood span{display:block;font-size:25px}.mood small{font-size:10px;color:var(--muted)}.mood.selected{border:2px solid var(--blue2);background:#eff8fd}
+.input{width:100%;border:1px solid #dce7ea;background:white;border-radius:13px;padding:12px;font:inherit;font-size:13px;color:var(--ink);margin:6px 0 12px;outline:none}.input:focus{border-color:var(--blue2)}textarea.input{min-height:115px;resize:vertical}
+.notice{background:#f0f6f7;border-radius:15px;padding:13px;font-size:12px;line-height:1.5;color:#526b77;margin:12px 0}.greenbox{background:#eaf6ef}.bluebox{background:#eaf4fb}
+.list{padding-left:18px;color:#526a78;font-size:13px;line-height:1.65}.pill{display:inline-block;background:#edf5f5;color:#54736f;padding:5px 9px;border-radius:20px;font-size:10px;margin:3px 3px 3px 0}
+.nav{position:absolute;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);border-top:1px solid var(--line);padding:10px 8px 15px;display:flex;justify-content:space-around}.nav button{background:transparent;color:#83949d;padding:5px 8px;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:3px}.nav button span{font-size:19px}.nav button.active{color:#367b9f}
+.topback{background:transparent;color:#668293;padding:4px 0 12px}.choice{display:flex;gap:10px;margin-top:20px}.choice button{flex:1;padding:17px 10px;line-height:1.5}.choice span{display:block;font-size:25px;margin-bottom:6px}
+.timer{font-size:48px;font-weight:800;text-align:center;margin:22px 0 5px;color:#477e8e}.circle{width:190px;height:190px;border-radius:50%;border:9px solid #dceefa;background:#f4fafc;margin:20px auto;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.footer-note{text-align:center;color:#8a9aa2;font-size:10px;margin-top:18px;line-height:1.45}
+@media(max-width:450px){body{padding:0;background:var(--cream)}.app{width:100%;min-height:100vh;border:0;border-radius:0;box-shadow:none}.nav{padding-bottom:max(15px,env(safe-area-inset-bottom))}main{min-height:calc(100vh - 130px)}}
+
+.ai-panel{background:linear-gradient(140deg,#edf6fc,#eef8f1);border:1px solid #dcebef;border-radius:19px;padding:15px;margin:12px 0}
+.task{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px;margin:9px 0}
+.task input{width:18px;height:18px;margin-top:2px;accent-color:#65a98b}
+.task p{font-size:11px;color:var(--muted);margin:4px 0 0;line-height:1.4}
+.tokenbar{display:flex;align-items:center;justify-content:space-between;background:#fff7df;border:1px solid #f1e5b9;border-radius:15px;padding:12px;margin:12px 0}
+.token{font-weight:800;color:#8a6415;font-size:17px}
+.reward{background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;margin:8px 0}
+.reward button{padding:9px 11px;font-size:11px}
+.reward button:disabled{opacity:.45;cursor:not-allowed}
+
+</style>
+</head>
+<body>
+<div class="app">
+ <div class="status"><span>9:41</span><span>● ● ● ▰</span></div>
+ <header><div class="brand"><div class="logo">✦</div>MindConnect</div><div class="badge" id="roleBadge">Welcome</div></header>
+ <main>
+  <section class="screen active" id="welcome">
+   <div class="hero"><span class="pill">A space to understand and support</span><h1>You don't have to figure it out alone.</h1><p>Small steps, honest conversations and helpful support can make a difference.</p></div>
+   <h2>Who is using MindConnect?</h2><p class="sub">Choose a demo view to explore the prototype.</p>
+   <div class="choice">
+    <button onclick="enter('teen')"><span>🌱</span>Teenager<br><small>Understand how I feel</small></button>
+    <button class="softgreen" onclick="enter('parent')"><span>🤝</span>Parent<br><small>Learn how to support</small></button>
+   </div>
+   <div class="notice">This is an educational prototype, not a medical service. It does not diagnose conditions or replace a trusted adult or professional.</div>
+   <p class="footer-note">MindConnect • Demo prototype</p>
+  </section>
+
+  <section class="screen" id="teenHome">
+   <div class="hero"><span class="pill">YOUR WELL-BEING SPACE</span><h1>Hi there 👋</h1><p>Take a moment for yourself. How are things going today?</p></div>
+   <div class="section-title"><h2>How are you feeling?</h2><span class="tiny">Daily check-in</span></div>
+   <div class="mood-row">
+    <div class="mood" onclick="chooseMood(this,'Great')"><span>😁</span><small>Great</small></div>
+    <div class="mood" onclick="chooseMood(this,'Okay')"><span>🙂</span><small>Okay</small></div>
+    <div class="mood" onclick="chooseMood(this,'Meh')"><span>😐</span><small>Meh</small></div>
+    <div class="mood" onclick="chooseMood(this,'Low')"><span>😟</span><small>Low</small></div>
+    <div class="mood" onclick="chooseMood(this,'Stressed')"><span>😣</span><small>Stressed</small></div>
+   </div>
+   <div id="moodMsg" class="tiny" aria-live="polite">Your check-in is private on this device.</div>
+   <div class="grid" style="margin-top:17px">
+    <div class="card" onclick="show('journal')"><div class="icon">📓</div><h3>My journal</h3><p>Write down what's on your mind.</p></div>
+    <div class="card" onclick="show('activities')"><div class="icon">🌿</div><h3>Feel calmer</h3><p>Try a short wellness activity.</p></div>
+    <div class="card wide" onclick="show('aiCoach')"><div class="icon">✨</div><h3>AI Wellness Coach</h3><p>Share how you're feeling and get a few gentle, practical activity suggestions.</p></div>
+    <div class="card wide" onclick="show('rewards')"><div class="icon">⭐</div><h3>My rewards</h3><p>Earn tokens for completing healthy activities and exchange them for small rewards.</p></div>
+    <div class="card wide" onclick="show('shareSupport')"><div class="icon">🔔</div><h3>Ask my trusted adult for support</h3><p>Choose to share a support request with your parent or guardian.</p></div>
+    <div class="card wide" onclick="show('help')"><div class="icon">💬</div><h3>Find support</h3><p>Explore ways to talk to someone you trust.</p></div>
+   </div>
+  </section>
+
+  <section class="screen" id="parentHome">
+   <div class="hero"><span class="pill">PARENT AWARENESS HUB</span><h1>Support starts with listening.</h1><p>Learn how to notice changes, start a conversation and make space for your teenager's feelings.</p></div>
+   <h2>Learn the basics</h2>
+   <div class="grid">
+    <div class="card" onclick="show('signs')"><div class="icon">🔎</div><h3>Changes to notice</h3><p>Understand patterns that may mean a teen needs support.</p></div>
+    <div class="card" onclick="show('talk')"><div class="icon">❤️</div><h3>How to talk</h3><p>Start a calm, non-judgemental conversation.</p></div>
+    <div class="card wide" onclick="show('parentAlerts')"><div class="icon">🔔</div><h3>Teen support alerts <span id="alertCount" class="pill">0 new</span></h3><p>View support requests shared by your teenager in this demo.</p></div>
+    <div class="card wide" onclick="show('parentGuide')"><div class="icon">🧠</div><h3>AI Parent Guidance</h3><p>Get educational suggestions for responding with care.</p></div>
+    <div class="card wide" onclick="show('help')"><div class="icon">🧭</div><h3>Getting support</h3><p>Know when and where to seek additional help.</p></div>
+   </div>
+   <div class="notice greenbox"><b>Remember:</b> One behaviour alone does not prove that a teenager has a mental health condition. Notice changes over time and ask with care.</div>
+  </section>
+
+  <section class="screen" id="journal">
+   <button class="topback" onclick="goHome()">← Back</button><h1>My emotion journal</h1><p class="sub">You can write freely. You do not need to make your feelings sound perfect.</p>
+   <label class="tiny" for="journalText">What's on your mind today?</label><textarea class="input" id="journalText" placeholder="Today I felt..."></textarea>
+   <button class="full" onclick="saveJournal()">Save on this device</button>
+   <div id="journalStatus" class="notice">Your entry stays in this browser on this device. This demo does not send it to a parent or server.</div>
+   <button class="secondary full" onclick="clearJournal()">Clear journal entry</button>
+  </section>
+
+  <section class="screen" id="activities">
+   <button class="topback" onclick="goHome()">← Back</button><h1>A calmer moment</h1><p class="sub">Try a gentle paced-breathing activity. Stop if it feels uncomfortable; just breathe normally instead.</p>
+   <div class="circle"><div id="breathWord" style="font-weight:700">Ready?</div><div class="timer" id="breathTime">60</div><div class="tiny">seconds remaining</div></div>
+   <p id="breathHint" style="text-align:center;color:var(--muted);font-size:13px">When ready, begin a comfortable, gentle rhythm.</p>
+   <button class="full" id="breathBtn" onclick="startBreathing()">Start activity</button>
+   <div class="notice">You can also try: stretch gently, listen to a favourite song, take a screen break, or talk to someone you trust.</div>
+  </section>
+
+  <section class="screen" id="signs">
+   <button class="topback" onclick="goHome()">← Back</button><h1>Changes to notice</h1><p class="sub">A change that lasts, becomes more intense or affects daily life may be a reason to check in.</p>
+   <div class="card" style="cursor:default;margin-bottom:10px"><h3>Possible changes</h3><ul class="list"><li>Becoming more withdrawn or losing interest in usual activities.</li><li>Ongoing changes in sleep, energy or mood.</li><li>Finding school, friendships or everyday tasks harder to manage.</li><li>Expressing feelings of hopelessness or being overwhelmed.</li></ul></div>
+   <div class="notice"><b>Keep perspective:</b> These signs can have many causes and are not a diagnosis. Ask gently, listen, and consider professional advice if concerns persist or affect daily life.</div>
+   <button class="softgreen full" onclick="show('talk')">How can I start a conversation?</button>
+  </section>
+
+  <section class="screen" id="talk">
+   <button class="topback" onclick="goHome()">← Back</button><h1>Start with a conversation</h1><p class="sub">Choose curiosity over assumptions. Find a calm moment and give your teenager time to respond.</p>
+   <div class="card" style="cursor:default"><span class="pill">Try saying</span><h2 style="margin-top:9px">“I've noticed you seem a little different lately. How have things been feeling for you?”</h2><p>Other helpful prompts:</p><ul class="list"><li>“Would you like me to listen, or help think through it?”</li><li>“Thank you for telling me.”</li><li>“What would feel supportive right now?”</li></ul></div>
+   <div class="notice greenbox"><b>Try to avoid:</b> dismissing feelings, comparing them with others, jumping straight to solutions or blaming them.</div>
+   <h3>Small action for today</h3><p class="sub">Set aside 10–15 minutes to spend together without distractions. Let your teenager choose the topic.</p>
+  </section>
+
+  <section class="screen" id="aiCoach">
+   <button class="topback" onclick="goHome()">← Back</button><h1>AI Wellness Coach ✨</h1>
+   <p class="sub">Tell the demo coach a little about what is going on. It will suggest small, optional activities—not diagnose you.</p>
+   <div class="ai-panel">
+    <label class="tiny" for="feelingSelect">What are you feeling most right now?</label>
+    <select class="input" id="feelingSelect">
+     <option value="stress">Stressed or overwhelmed</option><option value="sad">Sad or low</option><option value="lonely">Lonely or disconnected</option><option value="angry">Frustrated or angry</option><option value="tired">Tired or unmotivated</option><option value="okay">I just want a positive activity</option>
+    </select>
+    <label class="tiny" for="feelingDetails">What has been contributing to this? (Optional)</label>
+    <textarea class="input" id="feelingDetails" placeholder="For example: school deadlines, friendship worries, or feeling tired..."></textarea>
+    <button class="full" onclick="getCoachTasks()">Suggest my activities</button>
+   </div>
+   <div id="coachOutput" aria-live="polite"><div class="notice">You are in control. Choose only activities that feel comfortable, and skip anything that does not suit you.</div></div>
+   <div class="notice bluebox"><b>Privacy in this prototype:</b> Your answers are processed by simple demo rules in this browser. They are not sent to an AI service or shared with your parents. Avoid entering names or identifying details.</div>
+   <div class="notice"><b>Important:</b> If you feel unsafe, might be in immediate danger, or are worried you may not be able to keep yourself safe, don't rely on an activity or chatbot. Tell a trusted adult now and contact emergency services for urgent help.</div>
+  </section>
+
+  <section class="screen" id="rewards">
+   <button class="topback" onclick="goHome()">← Back</button><h1>My rewards ⭐</h1><p class="sub">Tokens are a fun way to celebrate taking small steps. You earn them for trying an activity—not for feeling happy or hiding difficult feelings.</p>
+   <div class="tokenbar"><div><div class="tiny">YOUR TOKEN BALANCE</div><div class="token"><span id="tokenCount">0</span> ✦ tokens</div></div><span style="font-size:28px">🏅</span></div>
+   <h2>Reward shelf</h2>
+   <p class="tiny">Demo rewards should be non-essential, safe and approved by a parent or guardian where needed.</p>
+   <div id="rewardList"></div>
+   <div class="notice greenbox">Rewards are optional. You never lose tokens for taking a break, skipping a task, or having a difficult day.</div>
+  </section>
+
+  <section class="screen" id="shareSupport">
+   <button class="topback" onclick="goHome()">← Back</button><h1>Ask for support 🔔</h1>
+   <p class="sub">If talking feels difficult, you can send a simple support request to your chosen trusted adult.</p>
+   <div class="notice bluebox"><b>Your choice matters.</b> This demo sends a basic alert only when you press the button. It does not automatically monitor your mood or share your journal.</div>
+   <label class="tiny" for="supportLevel">What kind of support would help?</label>
+   <select class="input" id="supportLevel"><option value="I would like someone to listen and talk with me.">I'd like someone to listen.</option><option value="I've been feeling overwhelmed and would like help.">I've been feeling overwhelmed.</option><option value="I'd like help finding a counsellor or professional.">I'd like help finding professional support.</option><option value="I don't know what I need, but I don't want to handle this alone.">I don't know what I need yet.</option></select>
+   <label class="tiny" for="adultName">Trusted adult's name (optional demo label)</label><input class="input" id="adultName" placeholder="e.g. Mum, Dad, guardian or school counsellor">
+   <button class="full" onclick="sendSupportAlert()">Send support request</button>
+   <div id="shareStatus" class="notice" aria-live="polite">In this prototype, the request appears in the Parent Dashboard on this same browser/device. No real message is sent.</div>
+   <div class="notice"><b>If you are in immediate danger or cannot keep yourself safe:</b> do not wait for an app alert. Tell a trusted adult in person now and contact local emergency services for urgent help.</div>
+  </section>
+
+  <section class="screen" id="parentAlerts">
+   <button class="topback" onclick="goHome()">← Back</button><h1>Support alerts 🔔</h1><p class="sub">Requests that a teenager has deliberately chosen to share in this demo.</p>
+   <div id="parentAlertList"></div>
+  </section>
+
+  <section class="screen" id="parentGuide">
+   <button class="topback" onclick="goHome()">← Back</button><h1>AI Parent Guidance 🧠</h1><p class="sub">Choose a situation to see general, educational guidance for supporting a teenager. This is not a diagnosis or a substitute for professional advice.</p>
+   <label class="tiny" for="parentConcern">What are you concerned about?</label>
+   <select class="input" id="parentConcern">
+    <option value="withdrawn">My teenager has become withdrawn.</option>
+    <option value="stress">They seem stressed or overwhelmed.</option>
+    <option value="sad">They seem persistently sad or low.</option>
+    <option value="anger">They seem unusually frustrated or angry.</option>
+    <option value="talk">They told me they are struggling.</option>
+   </select>
+   <button class="full" onclick="getParentGuidance()">Get guidance</button>
+   <div id="parentAdvice" class="notice">Select a concern to receive practical, supportive suggestions.</div>
+   <div class="notice bluebox"><b>Listen first:</b> Stay calm, take their feelings seriously, avoid blame, and ask what kind of support they would find helpful.</div>
+  </section>
+
+  <section class="screen" id="help">
+   <button class="topback" onclick="goHome()">← Back</button><h1>You deserve support</h1><p class="sub">You do not need to wait until things feel unbearable before asking for help.</p>
+   <div class="card" style="cursor:default;margin-bottom:10px"><div class="icon">🧑‍🏫</div><h3>Talk to a trusted adult</h3><p>A parent, relative, teacher, school counsellor or another adult you feel safe with can help you take the next step.</p></div>
+   <div class="card" style="cursor:default;margin-bottom:10px"><div class="icon">🩺</div><h3>Speak with a professional</h3><p>A doctor or qualified mental health professional can listen, assess your needs and discuss suitable support.</p></div>
+   <div class="notice bluebox"><b>If someone may be in immediate danger:</b> tell a trusted adult straight away and contact local emergency services. Stay with the person and get urgent help.</div>
+   <p class="tiny">This prototype is for awareness and education. In a real app, this page should contain verified, regularly updated local support contacts.</p>
+  </section>
+ </main>
+ <nav class="nav" id="nav" style="display:none">
+  <button class="active" data-target="home" onclick="navTo('home',this)"><span>⌂</span>Home</button>
+  <button data-target="activities" onclick="navTo('activities',this)"><span>🌿</span>Wellness</button>
+  <button data-target="help" onclick="navTo('help',this)"><span>♡</span>Support</button>
+  <button onclick="switchRole()"><span>⇄</span>Switch</button>
+ </nav>
+</div>
+<script>
+let role='teen', selectedMood='', breathInterval=null, breathRemaining=60, breathPhase=0;
+const screens=[...document.querySelectorAll('.screen')];
+function show(id){screens.forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'))}
+function enter(r){role=r;document.getElementById('roleBadge').textContent=r==='teen'?'Teen space':'Parent space';document.getElementById('nav').style.display='flex';goHome()}
+function goHome(){show(role==='teen'?'teenHome':'parentHome');document.querySelector('.nav button').classList.add('active')}
+function navTo(target,el){if(target==='home')goHome();else show(target);document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active')}
+function switchRole(){role=role==='teen'?'parent':'teen';document.getElementById('roleBadge').textContent=role==='teen'?'Teen space':'Parent space';goHome()}
+function chooseMood(el,mood){document.querySelectorAll('.mood').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');selectedMood=mood;document.getElementById('moodMsg').textContent='Thanks for checking in. Your selection is saved only for this demo session.';try{localStorage.setItem('mc_mood',mood)}catch(e){}}
+function saveJournal(){let t=document.getElementById('journalText').value;try{localStorage.setItem('mc_journal',t);document.getElementById('journalStatus').textContent='Saved on this device. This demo does not share your entry.'}catch(e){document.getElementById('journalStatus').textContent='Your browser could not save this entry.'}}
+function clearJournal(){document.getElementById('journalText').value='';try{localStorage.removeItem('mc_journal')}catch(e){}document.getElementById('journalStatus').textContent='Journal entry cleared from this browser.'}
+try{document.getElementById('journalText').value=localStorage.getItem('mc_journal')||''}catch(e){}
+function startBreathing(){if(breathInterval){clearInterval(breathInterval);breathInterval=null}breathRemaining=60;breathPhase=0;document.getElementById('breathBtn').textContent='Restart activity';const words=['Breathe in gently','Breathe out slowly'];function tick(){document.getElementById('breathTime').textContent=breathRemaining;let phase=Math.floor((60-breathRemaining)/5)%2;document.getElementById('breathWord').textContent=words[phase];document.getElementById('breathHint').textContent=phase===0?'Breathe in comfortably. No need to take a deep breath.':'Let your breath out gently.';breathRemaining--;if(breathRemaining<0){clearInterval(breathInterval);breathInterval=null;document.getElementById('breathWord').textContent='Well done';document.getElementById('breathTime').textContent='✓';document.getElementById('breathHint').textContent='Take a moment and notice how you feel.';document.getElementById('breathBtn').textContent='Start again'}}tick();breathInterval=setInterval(tick,1000)}
+
+// Demo wellness coach: local rule-based suggestions, not a connected generative AI.
+const coachTasks = {
+ stress:[
+  ['🌬️','Try a gentle breathing break','Spend one minute breathing comfortably. Stop if it feels uncomfortable.','breathing'],
+  ['📝','Make a tiny plan','Write down one thing you need to do, then choose a small first step.','journal'],
+  ['🚶','Take a short reset','If it is safe and practical, walk or stretch gently for five minutes.','reset']
+ ],
+ sad:[
+  ['💬','Reach out to someone kind','Send a simple message to a trusted person, such as “Could we talk for a bit?”','support'],
+  ['🎵','Choose a comforting activity','Listen to a favourite song, draw, read, or do something gentle you usually enjoy.','comfort'],
+  ['📝','Name what is on your mind','Write a few words about what has felt difficult, without judging yourself.','journal']
+ ],
+ lonely:[
+  ['📩','Make one small connection','Message a trusted friend, relative, teacher or another safe adult.','support'],
+  ['☕','Spend time near others','Join a family activity or sit with someone you feel comfortable around.','connect'],
+  ['🌱','Do something just for you','Choose a small activity that helps you feel connected to your interests.','comfort']
+ ],
+ angry:[
+  ['⏸️','Pause before responding','Step away from the conversation if safe. Give yourself a little time before replying.','reset'],
+  ['🖊️','Write it out privately','Describe what upset you and what you need. You do not have to send it to anyone.','journal'],
+  ['🌬️','Try a calming reset','Relax your shoulders and breathe normally at a comfortable pace.','breathing']
+ ],
+ tired:[
+  ['💧','Take a basic-care break','Have some water and take a screen break if you can.','reset'],
+  ['🪟','Get a change of scene','Sit somewhere comfortable or get some daylight if possible.','comfort'],
+  ['🎯','Choose one tiny step','Pick one manageable task, or decide that rest is what you need right now.','plan']
+ ],
+ okay:[
+  ['🌼','Notice one good moment','Write down one thing that went okay today, however small.','journal'],
+  ['🤝','Connect with someone','Share a positive moment or ask someone how their day is going.','connect'],
+  ['🎨','Do something creative','Draw, make something, read or enjoy a hobby for a few minutes.','comfort']
+ ]
+};
+function getCoachTasks(){
+ const feeling=document.getElementById('feelingSelect').value;
+ const details=document.getElementById('feelingDetails').value.trim();
+ const tasks=coachTasks[feeling]||coachTasks.okay;
+ const out=document.getElementById('coachOutput');
+ out.innerHTML='<h2>Here are a few gentle ideas</h2><p class="tiny">Pick one that feels manageable. You do not need to complete all of them.</p>'+
+ tasks.map((t,i)=>`<div class="task"><div style="font-size:22px">${t[0]}</div><div style="flex:1"><h3>${t[1]}</h3><p>${t[2]}</p><button class="softgreen" style="margin-top:9px" onclick="completeCoachTask('${t[3]}','${t[1].replace(/'/g,"")}')">I tried this · +5 tokens</button></div></div>`).join('')+
+ '<div class="notice">You shared: '+(details?escapeText(details.slice(0,180)):'No extra details')+'. The demo uses your selected feeling to show general suggestions. It does not assess risk or provide a clinical recommendation.</div>';
+}
+function escapeText(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function getTokens(){try{return parseInt(localStorage.getItem('mc_tokens')||'0',10)||0}catch(e){return 0}}
+function setTokens(n){try{localStorage.setItem('mc_tokens',String(n))}catch(e){};updateRewards()}
+function completeCoachTask(kind,label){
+ setTokens(getTokens()+5);
+ alert('Nice work giving that activity a try. 5 tokens added! Remember, taking a break is okay too.');
+ if(kind==='breathing')show('activities'); else if(kind==='journal')show('journal'); else if(kind==='support')show('help');
+}
+const rewardItems=[
+ {id:'theme',name:'Unlock a new app colour theme',cost:15,desc:'A small in-app personalisation reward.'},
+ {id:'badge',name:'Get a “Small Steps” badge',cost:20,desc:'A digital badge for your collection.'},
+ {id:'choice',name:'Choose the family activity',cost:30,desc:'Ask your parent or guardian to plan a safe activity together.'}
+];
+function updateRewards(){
+ const balance=getTokens();const count=document.getElementById('tokenCount');if(count)count.textContent=balance;
+ const list=document.getElementById('rewardList');if(!list)return;
+ let redeemed=[];try{redeemed=JSON.parse(localStorage.getItem('mc_redeemed')||'[]')}catch(e){}
+ list.innerHTML=rewardItems.map(r=>`<div class="reward"><div><b style="font-size:12px">${r.name}</b><div class="tiny">${r.desc}</div><span class="pill">${r.cost} tokens</span></div><button ${balance<r.cost||redeemed.includes(r.id)?'disabled':''} onclick="redeemReward('${r.id}')">${redeemed.includes(r.id)?'Redeemed':'Redeem'}</button></div>`).join('');
+}
+function redeemReward(id){
+ const item=rewardItems.find(x=>x.id===id);if(!item||getTokens()<item.cost)return;
+ setTokens(getTokens()-item.cost);let redeemed=[];try{redeemed=JSON.parse(localStorage.getItem('mc_redeemed')||'[]')}catch(e){}
+ redeemed.push(id);try{localStorage.setItem('mc_redeemed',JSON.stringify(redeemed))}catch(e){}
+ updateRewards();alert('Reward redeemed in this demo! For real-world rewards, a parent or guardian should approve the option first.');
+}
+updateRewards();
+
+
+// Parent support alerts are opt-in and simulated locally for this prototype.
+// A production app would require secure accounts, verified guardians, consent,
+// safeguarding policies, and a secure notification service.
+function readAlerts(){try{return JSON.parse(localStorage.getItem('mc_support_alerts')||'[]')}catch(e){return []}}
+function writeAlerts(a){try{localStorage.setItem('mc_support_alerts',JSON.stringify(a))}catch(e){};renderParentAlerts()}
+function sendSupportAlert(){
+ const level=document.getElementById('supportLevel').value;
+ const adult=(document.getElementById('adultName').value||'Trusted adult').trim().slice(0,60);
+ const alerts=readAlerts();
+ alerts.unshift({id:Date.now(),adult:adult||'Trusted adult',message:level,time:new Date().toLocaleString(),read:false});
+ writeAlerts(alerts);
+ document.getElementById('shareStatus').textContent='Your support request has been added to the Parent Dashboard in this same browser. In a real app, this would be securely sent to the verified adult you selected.';
+}
+function renderParentAlerts(){
+ const alerts=readAlerts();
+ const list=document.getElementById('parentAlertList');
+ const count=document.getElementById('alertCount');
+ if(count)count.textContent=alerts.filter(a=>!a.read).length+' new';
+ if(!list)return;
+ if(!alerts.length){list.innerHTML='<div class="notice">No support requests have been shared yet. A teenager can choose to send one from their dashboard.</div>';return}
+ list.innerHTML=alerts.map(a=>`<div class="card" style="cursor:default;margin:9px 0"><span class="pill">${a.read?'Viewed':'New support request'}</span><h3 style="margin-top:8px">For: ${escapeText(a.adult)}</h3><p>${escapeText(a.message)}</p><p class="tiny">${escapeText(a.time)}</p>${a.read?'':'<button class="softgreen" onclick="markAlertRead('+a.id+')">Mark as read</button>'}</div>`).join('');
+}
+function markAlertRead(id){const a=readAlerts().map(x=>x.id===id?{...x,read:true}:x);writeAlerts(a)}
+const parentAdvice={
+ withdrawn:{
+  title:'Respond with gentle curiosity',
+  steps:['Choose a calm, private moment without rushing them.','Try: “I’ve noticed you’ve been spending more time alone. How have things been for you?”','Listen without interrupting or demanding an explanation.','Offer choices: talking now, talking later, or speaking with another trusted adult.'],
+  avoid:'Avoid accusing them of being secretive, forcing them to talk, or assuming you know the reason.'
+ },
+ stress:{
+  title:'Help make the next step manageable',
+  steps:['Acknowledge that the situation feels difficult to them.','Ask what feels most urgent and whether they want listening or practical help.','Help break one problem into a small, realistic next step.','Encourage rest, supportive routines and school support where appropriate.'],
+  avoid:'Avoid minimising their stress or adding pressure with comparisons.'
+ },
+ sad:{
+  title:'Take their feelings seriously',
+  steps:['Let them know you care and are available to listen.','Ask open questions such as “What has this been like for you?”','Check in gently over time rather than expecting one conversation to solve everything.','If low mood persists or affects daily life, help arrange an appointment with a qualified professional.'],
+  avoid:'Avoid saying they should simply cheer up or that others have it worse.'
+ },
+ anger:{
+  title:'Prioritise calm and respectful communication',
+  steps:['If emotions are high, allow a safe pause before continuing the discussion.','Keep your voice calm and set respectful boundaries.','When calmer, ask what was happening for them and what might help next time.','Look for patterns or pressures without labelling them as a problem.'],
+  avoid:'Avoid arguing in the heat of the moment, shaming, or threatening punishment for expressing feelings.'
+ },
+ talk:{
+  title:'Thank them for trusting you',
+  steps:['Say: “Thank you for telling me. I’m glad you came to me.”','Listen and ask what support they want right now.','Do not promise secrecy if safety may be at risk; explain that you may need to involve someone who can help.','Work together on the next step, including a counsellor, doctor or other qualified professional if needed.'],
+  avoid:'Avoid interrogating them, dismissing the concern, or making the conversation about your reaction.'
+ }
+};
+function getParentGuidance(){
+ const c=document.getElementById('parentConcern').value, a=parentAdvice[c];
+ document.getElementById('parentAdvice').innerHTML='<h3>'+a.title+'</h3><ol class="list">'+a.steps.map(x=>'<li>'+x+'</li>').join('')+'</ol><div class="notice"><b>Try to avoid:</b> '+a.avoid+'</div><div class="notice bluebox"><b>When to seek more help:</b> If concerns persist, worsen, or interfere with everyday life, consult a qualified mental health professional. If you believe the teenager is in immediate danger, stay with them if safe, involve a trusted adult/professional immediately and contact emergency services.</div>';
+}
+renderParentAlerts();
+
+</script>
+</body>
+</html>
